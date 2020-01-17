@@ -112,9 +112,9 @@ def main_sence():
     #创建默认体力扣减事件，每隔3000毫秒发送一次
     e_reduce_power = USEREVENT+2
     pygame.time.set_timer(e_reduce_power,3000)
-    #创建障碍物的事件，每隔1500毫秒发送
+    #创建障碍物的事件，每隔800毫秒发送
     e_creat_obstacle = USEREVENT+3
-    pygame.time.set_timer(e_creat_obstacle,1500)
+    pygame.time.set_timer(e_creat_obstacle,800)
     #创建食物事件，每隔5000毫秒发送
     e_creat_food = USEREVENT+4
     pygame.time.set_timer(e_creat_food,5000)
@@ -127,6 +127,7 @@ def main_sence():
     collide_list = []
 
     while True:
+        print(beibei.movespeed)
         #设置帧率
         clock.tick(Config.FPS)
         #事件监听
@@ -157,21 +158,28 @@ def main_sence():
             if e.type == e_add_distance:
                 if running:
                     distance.add_distance()
+
+            if e.type == KEYUP:
+                beibei.movespeed = 2
                     
         #当游戏开始后，监听键盘按下，在屏幕范围内设置beibei实例前后左右移动
         if running:
             if pygame.key.get_pressed()[K_a]:
                 if beibei.rect.x >= 0:
-                    beibei.rect.x = beibei.rect.x - 2
+                    beibei.increase_movespeed(clock.get_time())
+                    beibei.rect.x = beibei.rect.x - beibei.movespeed
             if pygame.key.get_pressed()[K_d]:
                 if beibei.rect.x <= 320-64:
-                    beibei.rect.x = beibei.rect.x + 2
+                    beibei.increase_movespeed(clock.get_time())
+                    beibei.rect.x = beibei.rect.x + beibei.movespeed
             if pygame.key.get_pressed()[K_w]:
                 if beibei.rect.y >= 0:
-                    beibei.rect.y = beibei.rect.y - 2
+                    beibei.increase_movespeed(clock.get_time())
+                    beibei.rect.y = beibei.rect.y - beibei.movespeed
             if pygame.key.get_pressed()[K_s]:
                 if beibei.rect.y <= 240-64:
-                    beibei.rect.y = beibei.rect.y + 2
+                    beibei.increase_movespeed(clock.get_time())
+                    beibei.rect.y = beibei.rect.y + beibei.movespeed
         
         #与beibei实例碰撞的sprite会被添加到collide_list列表中，并将其在obstacle_group中删除
         collide_list = pygame.sprite.spritecollide(beibei,obstacle_group,True)
@@ -210,9 +218,11 @@ def main_sence():
         pygame.display.update()
 
 def end_sence():
+    #声明全局变量final_distance
     global final_distance
     #end_sence
     end_sence = pygame.Surface((screen.get_rect().width,screen.get_rect().height))
+
     message = "滑行距离 "+str(final_distance)+" 米"
     score_text = creat_font(size=35).render(message,True,(150,150,150))
     score_text_rect = score_text.get_rect()
@@ -225,6 +235,7 @@ def end_sence():
             if e.type == QUIT:
                 pygame.quit()
                 sys.exit()
+            #按S重置final_distance为0，并运行main_sence，重新开始游戏
             if e.type == KEYDOWN:
                 if e.key == K_s:
                     final_distance = 0

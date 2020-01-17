@@ -8,7 +8,8 @@ class Beibei(pygame.sprite.Sprite):
 		self.image = pygame.image.load("assets/images/skiing.png")
 		self.rect = self.image.get_rect()
 		self.rect.centerx = surface.get_rect().centerx
-		#以下为试验
+		self.movespeed = 2
+		self.move_time = 0
 		self.frame = 0
 		self.tick_time = 0
 
@@ -17,5 +18,13 @@ class Beibei(pygame.sprite.Sprite):
 		if self.tick_time >= 1000/5:
 			self.frame = self.frame + 1
 			self.tick_time = 0
-			print(self.frame)
+			# print(self.frame)
 		self.surface.blit(self.image,self.rect)
+
+	def increase_movespeed(self,dt):
+		if self.movespeed < 4:
+			self.move_time = self.move_time + dt
+			if self.move_time >= 1000/100:
+				self.movespeed = self.movespeed + 0.5
+				self.move_time = 0
+
